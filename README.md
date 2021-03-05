@@ -1,2 +1,10 @@
-# Understanding political news media consumption with digital trace data and natural language processing
+# European election tracking data project
 
+doc
+: documentation and code examples, templates
+
+lit
+: literature
+
+src
+: source code
