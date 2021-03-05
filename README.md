@@ -1,5 +1,7 @@
 # Understanding political news media consumption with digital trace data and natural language processing
 
+This repository contains code for the paper "Understanding political news media consumption with digital trace data and natural language processing". 
+
 doc
 : documentation and code examples, templates. Python code for scraping headlines, fine-tuning BERT, and obtainind BERT embeddings
 
