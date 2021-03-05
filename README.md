@@ -1,2 +1,2 @@
-# Understanding political news mediaconsumption with digital trace dataand natural language processing
+# Understanding political news media consumption with digital trace data and natural language processing
 
