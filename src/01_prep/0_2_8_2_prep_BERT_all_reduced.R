@@ -34,10 +34,10 @@ summary(individual.counts)
 url_bert_reduced <- drop_na(url_bert_reduced, contains("X"))
 url_bert_reduced <- drop_na(url_bert_reduced, pseudonym)
 
-### Need to make sure we only have articles read before election
+### Need to make sure we only have articles read before survey data collection
 url_bert_reduced <- url_bert_reduced %>% 
   mutate(dt = as_date(used_at)) %>%
-  filter(dt <= "2019-05-26")
+  filter(dt <= "2019-05-17")
 
 encodings <- url_bert_reduced[which(!duplicated(url_bert_reduced$url_id)), which(str_detect(names(url_bert_reduced),"^X"))]
 l2norm <- sqrt(rowSums(encodings^2))

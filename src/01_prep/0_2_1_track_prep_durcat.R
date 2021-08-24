@@ -11,9 +11,9 @@ URL1 <- rbind(pc.url, m.url)
 rm(pc.url, m.url)
 
 
-# Need to make sure we only have logs before election
+# Need to make sure we only have logs before survey data collection
 URL1 <- URL1 %>% 
-  filter(used_at<="2019-05-26 00:00:01")
+  filter(used_at<="2019-05-17 00:00:01")
 
 
 # split "category" into four (max number of categories in "category") separate vars
@@ -293,7 +293,7 @@ app <- readRDS("./data/work/apps.RDS")
 app <- app[!(is.na(app$domain)),]
 
 app <- app %>% 
-  filter(used_at<="2019-05-26 00:00:01")
+  filter(used_at<="2019-05-17 00:00:01")
 
 app$category <- as.factor(app$category)
 

@@ -35,19 +35,20 @@ ctrl  <- trainControl(method = "repeatedcv",
 grid <- expand.grid(alpha = c(0, 0.5, 1),
                     lambda = seq(1, 0, length = 50))
 
-bert_pca_cluster_reduced_small <- c("clus10_n_r", "clus16_n_r", "clus23_n_r",
-                                    "median_dim2_r", "var_dim2_r")
+bert_pca_cluster_reduced_small <- c("clus8_n_r", "clus9_n_r", "clus17_n_r",
+                                    "median_dim2_r", "var_dim2_r",
+                                    "median_dim3_r", "var_dim3_r")
 
-bert_pca_cluster_reduced_s_de <- c("clus23_r_r", "median_dim2_r", "var_dim2_r")
-bert_pca_cluster_reduced_s_fr <- c("clus16_r_r", "median_dim2_r", "var_dim2_r")
-bert_pca_cluster_reduced_s_uk <- c("clus10_r_r", "median_dim2_r", "var_dim2_r")
+bert_pca_cluster_reduced_s_de <- c("clus9_r_r", "median_dim3_r", "var_dim3_r")
+bert_pca_cluster_reduced_s_fr <- c("clus8_r_r", "median_dim2_r", "var_dim2_r")
+bert_pca_cluster_reduced_s_uk <- c("clus17_r_r", "median_dim2_r", "var_dim2_r")
 
 model_de_v1 <- paste("undecided ~", paste(demo_de, collapse="+"))
 model_de_v2 <- paste("undecided ~", paste(demo_de, collapse="+"),
-                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), 
-                     paste("+"), paste(pred_track_cat_app_all, collapse="+"))
+                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), paste("+ no_dom_data"),
+                     paste("+"), paste(pred_track_cat_app_all, collapse="+"), paste("+ no_app_data"))
 model_de_v3 <- paste("undecided ~", paste(demo_de, collapse="+"), 
-                     paste("+"), paste(pred_track_dom_all, collapse="+"), 
+                     paste("+"), paste(pred_track_dom_all, collapse="+"), paste("+ no_dom_data"),
                      paste("+"), paste(pred_track_app_all, collapse="+"), paste("+ no_app_data"))
 model_de_v4 <- paste("undecided ~", paste(demo_de, collapse="+"),
                      paste("+"), paste(bert_pca_cluster_reduced_pca, collapse="+"), 
@@ -60,10 +61,10 @@ model_de_v6 <- paste("undecided ~", paste(demo_de, collapse="+"),
 
 model_fr_v1 <- paste("undecided ~", paste(demo_fr, collapse="+"))
 model_fr_v2 <- paste("undecided ~", paste(demo_fr, collapse="+"),
-                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), 
-                     paste("+"), paste(pred_track_cat_app_all, collapse="+"))
+                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), paste("+ no_dom_data"), 
+                     paste("+"), paste(pred_track_cat_app_all, collapse="+"), paste("+ no_app_data"))
 model_fr_v3 <- paste("undecided ~", paste(demo_fr, collapse="+"),
-                     paste("+"), paste(pred_track_dom_all, collapse="+"), 
+                     paste("+"), paste(pred_track_dom_all, collapse="+"), paste("+ no_dom_data"),
                      paste("+"), paste(pred_track_app_all, collapse="+"), paste("+ no_app_data"))
 model_fr_v4 <- paste("undecided ~", paste(demo_fr, collapse="+"),
                      paste("+"), paste(bert_pca_cluster_reduced_pca, collapse="+"), 
@@ -76,10 +77,10 @@ model_fr_v6 <- paste("undecided ~", paste(demo_fr, collapse="+"),
 
 model_uk_v1 <- paste("undecided ~", paste(demo_uk, collapse="+"))
 model_uk_v2 <- paste("undecided ~", paste(demo_uk, collapse="+"),
-                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), 
-                     paste("+"), paste(pred_track_cat_app_all, collapse="+"))
+                     paste("+"), paste(pred_track_cat_dom_all, collapse="+"), paste("+ no_dom_data"), 
+                     paste("+"), paste(pred_track_cat_app_all, collapse="+"), paste("+ no_app_data"))
 model_uk_v3 <- paste("undecided ~", paste(demo_uk, collapse="+"),
-                     paste("+"), paste(pred_track_dom_all, collapse="+"), 
+                     paste("+"), paste(pred_track_dom_all, collapse="+"), paste("+ no_dom_data"), 
                      paste("+"), paste(pred_track_app_all, collapse="+"), paste("+ no_app_data"))
 model_uk_v4 <- paste("undecided ~", paste(demo_uk, collapse="+"),
                      paste("+"), paste(bert_pca_cluster_reduced_pca, collapse="+"), 
@@ -303,35 +304,41 @@ save(glmnet_de_v1, glmnet_de_v2, glmnet_de_v3, glmnet_de_v4, glm_de_v5, glm_de_v
 
 glm_de <- tidy(glm_de_v5$finalModel) %>% 
   by_2sd(track_de) %>% 
-  filter(term %in% c("clus10_n_r", "clus16_n_r", "clus23_n_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus10_n_r = "Brexit Cluster",
-                     clus16_n_r = "French Politics Cluster",
-                     clus23_n_r = "Elections Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_n_r", "clus9_n_r", "clus17_n_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_n_r = "FR Politics Cluster",
+                     clus9_n_r = "GER Elections Cluster",
+                     clus17_n_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>% 
   mutate(model = "Germany")
 
 glm_fr <- tidy(glm_fr_v5$finalModel) %>% 
   by_2sd(track_fr) %>% 
-  filter(term %in% c("clus10_n_r", "clus16_n_r", "clus23_n_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus10_n_r = "Brexit Cluster",
-                     clus16_n_r = "French Politics Cluster",
-                     clus23_n_r = "Elections Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_n_r", "clus9_n_r", "clus17_n_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_n_r = "FR Politics Cluster",
+                     clus9_n_r = "GER Elections Cluster",
+                     clus17_n_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>%
   mutate(model = "France")
 
 glm_uk <- tidy(glm_uk_v5$finalModel) %>% 
   by_2sd(track_uk) %>% 
-  filter(term %in% c("clus10_n_r", "clus16_n_r", "clus23_n_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus10_n_r = "Brexit Cluster",
-                     clus16_n_r = "French Politics Cluster",
-                     clus23_n_r = "Elections Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_n_r", "clus9_n_r", "clus17_n_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_n_r = "FR Politics Cluster",
+                     clus9_n_r = "GER Elections Cluster",
+                     clus17_n_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>% 
   mutate(model = "UK")
 
 models <- rbind(glm_de, glm_fr, glm_uk)
@@ -347,42 +354,56 @@ ggsave("u_coef.png", width = 7.5, height = 6)
 
 glm_de <- tidy(glm_de_v6$finalModel) %>% 
   by_2sd(track_de) %>% 
-  filter(term %in% c("clus10_r_r", "clus16_r_r", "clus23_r_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus23_r_r = "Elections Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_r_r", "clus9_r_r", "clus17_r_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_r_r = "FR Politics Cluster",
+                     clus9_r_r = "GER Elections Cluster",
+                     clus17_r_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>% 
   mutate(model = "Germany")
 
 glm_fr <- tidy(glm_fr_v6$finalModel) %>% 
   by_2sd(track_fr) %>% 
-  filter(term %in% c("clus10_r_r", "clus16_r_r", "clus23_r_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus16_r_r = "French Politics Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_r_r", "clus9_r_r", "clus17_r_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_r_r = "FR Politics Cluster",
+                     clus9_r_r = "GER Elections Cluster",
+                     clus17_r_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>% 
   mutate(model = "France")
 
 glm_uk <- tidy(glm_uk_v6$finalModel) %>% 
   by_2sd(track_uk) %>% 
-  filter(term %in% c("clus10_r_r", "clus16_r_r", "clus23_r_r", 
-                     "median_dim2_r", "var_dim2_r")) %>% 
-  relabel_predictors(clus10_r_r = "Brexit Cluster",
-                     median_dim2_r = "Crime vs. Elections (Median)",
-                     var_dim2_r = "Crime vs. Elections (Var)") %>% 
+  filter(term %in% c("clus8_r_r", "clus9_r_r", "clus17_r_r", 
+                     "median_dim2_r", "var_dim2_r", "median_dim3_r", "var_dim3_r")) %>% 
+  relabel_predictors(clus8_r_r = "FR Politics Cluster",
+                     clus9_r_r = "GER Elections Cluster",
+                     clus17_r_r = "UK Brexit Cluster",
+                     median_dim2_r = "UK Brexit vs. FR Crises (Median)",
+                     var_dim2_r = "UK Brexit vs. FR Crises (Var)",
+                     median_dim3_r = "Entertain vs. GER Elections (Median)",
+                     var_dim3_r = "Entertain vs. GER Elections (Var)") %>%  
   mutate(model = "UK")
 
 models <- rbind(glm_de, glm_fr, glm_uk)
 
 models$term <- fct_relevel(models$term, 
-                           "Brexit Cluster", "French Politics Cluster", "Elections Cluster",
-                           "Crime vs. Elections (Median)", "Crime vs. Elections (Var)")
+                           "UK Brexit Cluster", "FR Politics Cluster", "GER Elections Cluster",
+                           "UK Brexit vs. FR Crises (Median)", "UK Brexit vs. FR Crises (Var)",
+                           "Entertain vs. GER Elections (Median)", "Entertain vs. GER Elections (Var)")
 
 dwplot(models, 
        vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2)) +
   xlab("Coefficient") + 
   ylab("") +
   theme(legend.title = element_blank(),
+        legend.position = "bottom",
         text = element_text(size = 17))
 
 ggsave("u_coef2.png", width = 7.5, height = 6)
@@ -451,6 +472,93 @@ resamp %>%
   labs(y = "ROC-AUC") +
   coord_flip() +
   theme(legend.title = element_blank(),
-        text = element_text(size = 17))
+        legend.position = "bottom",
+        text = element_text(size = 17)) + 
+  guides(fill = guide_legend(nrow = 2, byrow = TRUE))
 
 ggsave("u_perf2.png", width = 6, height = 6)
+
+##################################################################################
+# Variable importance
+##################################################################################
+
+varImp(glm_de_v6)
+
+varImp(glm_de_v6)$importance %>% 
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  arrange(Overall) %>%
+  top_n(10, Overall) %>% 
+  mutate(rowname = forcats::fct_inorder(rowname),
+         row = fct_recode(rowname,
+                          "Education: GER Medium" = "education_DE2WeiterfuehrendeSchuleMittelRealHandelsschule",
+                          "Employment: Part-time" = "empl_status2Parttime",
+                          "Employment: Not Working" = "empl_status2Notworking",
+                          "Employment: In School" = "empl_status2Inschool",
+                          "Entertain vs. GER Elections (Var)" = "var_dim3_r",
+                          "Family: Single" = "family_UK_DE2Single",
+                          "Income: No Answer" = "income_FR_DENANoanswer",
+                          "Education: GER High" = "education_DE3AbiturFachHochschulreife",
+                          "Age" = "age",
+                          "Male" = "gendermale")) %>%
+  ggplot() +
+  geom_col(aes(x = row, y = Overall)) +
+  labs(y = "Importance", x = "") +
+  coord_flip() +
+  theme(text = element_text(size = 17))
+
+ggsave("u_imp_ger.png", width = 6, height = 6)
+
+varImp(glm_fr_v6)
+
+varImp(glm_fr_v6)$importance %>% 
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  arrange(Overall) %>%
+  top_n(10, Overall) %>% 
+  mutate(rowname = forcats::fct_inorder(rowname),
+         row = fct_recode(rowname,
+                          "Education: FR BEP" = "education_FR2BEP",
+                          "Employment: Missing" = "empl_status2Missing",
+                          "HH Size: 4 People" = "hh_size4People",
+                          "Income: >4000 EUR" = "income_FR_DE9morethan4000EUR",
+                          "Education: FR BAC+2" = "education_FR6Bac2DUTBTS",
+                          "Education: FR BAC+3" = "education_FR7bac3Licence",
+                          "Income: No Answer" = "income_FR_DENANoanswer",
+                          "No BERT features" = "no_reduced_bertno_reduced_bert",
+                          "Age" = "age",
+                          "Male" = "gendermale")) %>%
+  ggplot() +
+  geom_col(aes(x = row, y = Overall)) +
+  labs(y = "Importance", x = "") +
+  coord_flip() +
+  theme(text = element_text(size = 17))
+
+ggsave("u_imp_fr.png", width = 6, height = 6)
+
+varImp(glm_uk_v6)
+
+varImp(glm_uk_v6)$importance %>% 
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  arrange(Overall) %>%
+  top_n(10, Overall) %>% 
+  mutate(rowname = forcats::fct_inorder(rowname),
+         row = fct_recode(rowname,
+                          "Employment: Not Working" = "empl_status2Notworking",
+                          "Education: UK Undergrad." = "education_UK4Undergraduatedegreeorequivalent",
+                          "Family: Divorced-Widowed" = "family_UK_DE3Divorcedwidowed",
+                          "HH Size: 5 People" = "hh_size5People",
+                          "Income: 1500-2000 pounds" = "income_UK41500to2000pounds",
+                          "Income: No Answer" = "income_UKNANoanswer",
+                          "Income: 2000-2500 pounds" = "income_UK52000to2500pounds",
+                          "Male" = "gendermale",
+                          "Age" = "age",
+                          "UK Brexit Cluster" = "clus17_r_r")) %>%
+  ggplot() +
+  geom_col(aes(x = row, y = Overall)) +
+  labs(y = "Importance", x = "") +
+  coord_flip() +
+  theme(text = element_text(size = 17))
+
+ggsave("u_imp_uk.png", width = 6, height = 6)

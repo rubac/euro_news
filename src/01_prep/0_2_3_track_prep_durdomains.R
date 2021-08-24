@@ -10,9 +10,9 @@ pc.url <- pc.url %>%
 URL1 <- rbind(pc.url, m.url)
 rm(pc.url, m.url)
 
-# Need to make sure we only have logs before election
+# Need to make sure we only have logs before survey data collection
 URL1 <- URL1 %>% 
-  filter(used_at<="2019-05-26 00:00:01")
+  filter(used_at<="2019-05-17 00:00:01")
 
 # remove ending of domains to create overlap between countries
 URL1$domain <- gsub("\\..*","",URL1$domain)

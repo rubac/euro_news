@@ -4,9 +4,9 @@ setwd("/home/wrszemsrgyercqh/an_work/EU")
 app <- readRDS("./data/work/apps.RDS")
 app <- app[!(is.na(app$domain)),]
 
-# Need to make sure we only have logs before election
+# Need to make sure we only have logs before survey data collection
 app <- app %>% 
-  filter(used_at<="2019-05-26 00:00:01")
+  filter(used_at<="2019-05-17 00:00:01")
 
 # remove system apps
 drop.app <- read.csv("./data/work/system_apps.csv")

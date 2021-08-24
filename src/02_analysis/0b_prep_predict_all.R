@@ -24,13 +24,13 @@ predictors.dom.all <- readRDS(file="./data/work/pred_track_dom_all.RDS")
 predictors.app.all <- readRDS(file="./data/work/pred_track_app_all.RDS")
 
 # bert data  --- reduced set of respondents
-bert.all <- readRDS(file="./data/work/bert_all.RDS")
+# bert.all <- readRDS(file="./data/work/bert_all.RDS")
 
 # bert reduced data  --- reduced set of respondents
 bert.reduced.all <- readRDS(file="./data/work/bert_all_reduced.RDS")
 
 # topic data  --- reduced set of respondents
-topics.all <- readRDS(file="./data/work/topics_all.RDS")
+# topics.all <- readRDS(file="./data/work/topics_all.RDS")
 
 # load survey data
 sdata <- readRDS("./data/work/dat_surv.rds")
@@ -152,7 +152,7 @@ predictors.app.all <- predictors.app.all[, !duplicated(colnames(predictors.app.a
 pred_track_app_all <- names(select(predictors.app.all, -panelistid))
 
 # BERT - PCA and Cluster
-bert_pca_cluster_all <- names(select(bert.all, -pseudonym))
+# bert_pca_cluster_all <- names(select(bert.all, -pseudonym))
 
 # BERT reduced - PCA and Cluster
 bert_pca_cluster_reduced_full <- names(select(bert.reduced.all, -pseudonym))
@@ -165,21 +165,31 @@ bert_pca_cluster_reduced_all <- c(bert_pca_cluster_reduced_pca,
                                   bert_pca_cluster_reduced_cd)
 
 # Topics - LCA and NMF
-topics_all <- names(select(topics.all, -pseudonym))
+# topics_all <- names(select(topics.all, -pseudonym))
 
 # Merge survey and tracking data
 
 track_data <- 
   spdata %>%
-  inner_join(predictors.cat.dom.all, by = c("panelist_id" = "panelistid")) %>% # drop cases w/o tracking data
-  inner_join(predictors.dom.all, by = c("panelist_id" = "panelistid")) %>%
+  left_join(predictors.cat.dom.all, by = c("panelist_id" = "panelistid")) %>%
+  left_join(predictors.dom.all, by = c("panelist_id" = "panelistid")) %>%
   left_join(predictors.cat.app.all, by = c("panelist_id" = "panelistid")) %>%
   left_join(predictors.app.all, by = c("panelist_id" = "panelistid")) %>%
-  left_join(bert.all, by = c("panelist_id" = "pseudonym")) %>%
-  left_join(bert.reduced.all, by = c("panelist_id" = "pseudonym")) %>%
-  left_join(topics.all, by = c("panelist_id" = "pseudonym"))
+  left_join(bert.reduced.all, by = c("panelist_id" = "pseudonym"))
 
-# Fill in zeros for respondents without app tracking or bert data
+# left_join(bert.all, by = c("panelist_id" = "pseudonym")) %>%
+# left_join(topics.all, by = c("panelist_id" = "pseudonym"))
+
+# Fill in zeros for respondents without tracking or bert data
+
+track_data$no_dom_data <- ifelse(is.na(track_data$dtotaldcat), "no_domain", "domain")
+track_data$no_dom_data <- as.factor(track_data$no_dom_data)
+
+track_data[pred_track_cat_dom_all][is.na(track_data[pred_track_cat_dom_all])] <- 0
+sum(is.na(track_data[,pred_track_cat_dom_all]))
+
+track_data[pred_track_dom_all][is.na(track_data[pred_track_dom_all])] <- 0
+sum(is.na(track_data[,pred_track_dom_all]))
 
 track_data$no_app_data <- ifelse(is.na(track_data$dtotalacat), "no_apps", "apps")
 track_data$no_app_data <- as.factor(track_data$no_app_data)
@@ -190,11 +200,11 @@ sum(is.na(track_data[,pred_track_cat_app_all]))
 track_data[pred_track_app_all][is.na(track_data[pred_track_app_all])] <- 0
 sum(is.na(track_data[,pred_track_app_all]))
 
-track_data$no_bert_data <- ifelse(is.na(track_data$clus1_d), "no_bert", "bert")
-track_data$no_bert_data <- as.factor(track_data$no_bert_data)
+# track_data$no_bert_data <- ifelse(is.na(track_data$clus1_d), "no_bert", "bert")
+# track_data$no_bert_data <- as.factor(track_data$no_bert_data)
 
-track_data[bert_pca_cluster_all][is.na(track_data[bert_pca_cluster_all])] <- 0
-sum(is.na(track_data[,bert_pca_cluster_all]))
+# track_data[bert_pca_cluster_all][is.na(track_data[bert_pca_cluster_all])] <- 0
+# sum(is.na(track_data[,bert_pca_cluster_all]))
 
 track_data$no_reduced_bert <- ifelse(is.na(track_data$clus1_d_r), "no_reduced_bert", "reduced_bert")
 track_data$no_reduced_bert <- as.factor(track_data$no_reduced_bert)
@@ -203,12 +213,12 @@ track_data$no_reduced_bert <- relevel(track_data$no_reduced_bert, ref = "reduced
 track_data[bert_pca_cluster_reduced_full][is.na(track_data[bert_pca_cluster_reduced_full])] <- 0
 sum(is.na(track_data[,bert_pca_cluster_reduced_full]))
 
-track_data$no_topics <- ifelse(is.na(track_data$lda1_n), "no_topics", "topics")
-track_data$no_topics <- as.factor(track_data$no_topics)
-track_data$no_topics <- relevel(track_data$no_topics, ref = "topics")
+# track_data$no_topics <- ifelse(is.na(track_data$lda1_n), "no_topics", "topics")
+# track_data$no_topics <- as.factor(track_data$no_topics)
+# track_data$no_topics <- relevel(track_data$no_topics, ref = "topics")
 
-track_data[topics_all][is.na(track_data[topics_all])] <- 0
-sum(is.na(track_data[,topics_all]))
+# track_data[topics_all][is.na(track_data[topics_all])] <- 0
+# sum(is.na(track_data[,topics_all]))
 
 sum(is.na(track_data[demo]))
 
@@ -255,11 +265,11 @@ save(track_de, track_fr, track_uk,
      media,
      pred_track_app_all, pred_track_dom_all,
      pred_track_cat_app_all, pred_track_cat_dom_all,
-     bert_pca_cluster_all, 
+    # bert_pca_cluster_all, 
      bert_pca_cluster_reduced_all,
      bert_pca_cluster_reduced_pca,
      bert_pca_cluster_reduced_cn,
      bert_pca_cluster_reduced_cd,
      bert_pca_cluster_reduced_cr,
-     topics_all,
+    # topics_all,
      file = "./src/02_analysis/prep_predict_all.Rdata")
